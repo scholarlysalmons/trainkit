@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import unittest
 
 class FullyConnected(nn.Module):
     def __init__(self, input_length, output_length, hidden_layer_nodes=[100]):
@@ -38,3 +39,53 @@ model = FullyConnected(input_length, output_length, hidden_layer_nodes)
 input_data = torch.randn(32, input_length)  # Example input data of shape (batch_size, input_length)
 output = model(input_data)
 print(output.shape)  # Print the shape of the output tensor
+
+
+class FullyConnectedTest(unittest.TestCase):
+    def test_output_shape(self):
+        input_length = 10
+        output_length = 5
+        hidden_layer_nodes = [100, 50, 20]
+
+        model = FullyConnected(input_length, output_length, hidden_layer_nodes)
+        input_data = torch.randn(32, input_length)
+
+        output = model(input_data)
+
+        self.assertEqual(output.shape, (32, output_length))
+
+    def test_gradients(self):
+        input_length = 10
+        output_length = 5
+        hidden_layer_nodes = [100, 50, 20]
+
+        model = FullyConnected(input_length, output_length, hidden_layer_nodes)
+        input_data = torch.randn(32, input_length)
+        output = model(input_data)
+
+        loss_fn = nn.MSELoss()
+        target = torch.randn_like(output)
+        loss = loss_fn(output, target)
+
+        model.zero_grad()
+        loss.backward()
+
+        for param in model.parameters():
+            self.assertIsNotNone(param.grad)
+
+    def test_forward_pass(self):
+        input_length = 10
+        output_length = 5
+        hidden_layer_nodes = [100, 50, 20]
+
+        model = FullyConnected(input_length, output_length, hidden_layer_nodes)
+        input_data = torch.randn(32, input_length)
+
+        output = model(input_data)
+
+        self.assertEqual(output.shape, (32, output_length))
+        self.assertTrue(torch.all(torch.isfinite(output)))
+
+
+if __name__ == '__main__':
+    unittest.main()

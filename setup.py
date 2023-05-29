@@ -8,5 +8,6 @@ setup(
     description='A library for simplifying training in Python',
     packages=find_packages(),
     install_requires=[
+        'torch',
     ],
 )
